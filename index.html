@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Hub - All Services</title>
+    <title>Mini YouTube</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* === BASE STYLES === */
         * {
@@ -18,6 +19,7 @@
             font-family: 'Segoe UI', Arial, sans-serif;
             color: #e0e0e0;
             overflow-x: hidden;
+            background-color: #0f0f0f;
         }
         
         #bgVideo {
@@ -29,7 +31,7 @@
             min-height: 100%;
             z-index: -1;
             object-fit: cover;
-            filter: brightness(0.6);
+            filter: brightness(0.3);
         }
         
         /* === MENU STYLES === */
@@ -54,11 +56,6 @@
             border-radius: 3px;
             transition: all 0.3s ease;
             box-shadow: 0 0 5px rgba(0, 255, 204, 0.7);
-        }
-        
-        .menu-toggle:hover span {
-            background: #ff00ff;
-            box-shadow: 0 0 8px rgba(255, 0, 255, 0.8);
         }
         
         .menu {
@@ -107,56 +104,12 @@
             border-left: 3px solid #00ffcc;
         }
         
-        .menu ul li a.active {
-            background: rgba(0, 255, 204, 0.2);
-            color: #00ffcc;
-            border-left: 3px solid #00ffcc;
-        }
-        
         .menu-category {
             color: #ff00ff;
             font-weight: bold;
             margin-top: 1.5rem;
             padding: 0.5rem 1rem;
             border-bottom: 1px solid rgba(255, 0, 255, 0.3);
-            font-size: 1.2rem;
-        }
-        
-        /* External link arrows */
-        .menu ul li a[target="_blank"]::after {
-            content: " ↗";
-            font-size: 0.9em;
-            color: rgba(0, 255, 204, 0.8);
-            margin-left: 5px;
-            transition: all 0.3s ease;
-        }
-        
-        .menu ul li a[target="_blank"]:hover::after {
-            color: #ff00ff;
-            transform: translateX(3px);
-        }
-        
-        /* Special menu link colors */
-        .menu ul li a[href^="https://wa.me"],
-        .menu ul li a[href^="https://whatsapp.com"] {
-            color: #25D366;
-            border-left: 3px solid rgba(37, 211, 102, 0.3);
-        }
-        
-        .menu ul li a[href^="https://wa.me"]:hover,
-        .menu ul li a[href^="https://whatsapp.com"]:hover {
-            background: rgba(37, 211, 102, 0.15);
-            border-left: 3px solid #25D366;
-        }
-        
-        .menu ul li a[href^="https://jiod"] {
-            color: #00ccff;
-            border-left: 3px solid rgba(0, 204, 255, 0.3);
-        }
-        
-        .menu ul li a[href^="https://jiod"]:hover {
-            background: rgba(0, 204, 255, 0.15);
-            border-left: 3px solid #00ccff;
         }
         
         /* === MAIN CONTAINER === */
@@ -165,7 +118,7 @@
             max-width: 600px;
             margin: 5vh auto;
             padding: 2rem;
-            background: rgba(10, 10, 20, 0.3);
+            background: rgba(10, 10, 20, 0.7);
             border-radius: 16px;
             border: 1px solid rgba(0, 255, 204, 0.7);
             box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
@@ -177,73 +130,243 @@
             margin-bottom: 0.5rem;
             color: #00ffcc;
             text-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+            text-align: center;
         }
         
         .subtitle {
             font-size: 1.1rem;
             margin-bottom: 1.5rem;
             color: rgba(255, 255, 255, 0.8);
-        }
-        
-        /* === QUICK ACCESS GRID === */
-        .quick-access {
-            margin-top: 2rem;
-        }
-        
-        .quick-access h3 {
-            font-size: 1.5rem;
-            color: #00ffcc;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
-        }
-        
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-        }
-        
-        .grid-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1rem;
-            background: rgba(20, 25, 30, 0.7);
-            border: 2px solid #00ffcc;
-            border-radius: 10px;
-            text-decoration: none;
-            color: #e0e0e0;
-            transition: all 0.3s ease;
-        }
-        
-        .grid-item:hover {
-            background: rgba(0, 255, 204, 0.3);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 255, 204, 0.3);
-        }
-        
-        .grid-item i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            color: #00ffcc;
-            transition: all 0.3s ease;
-        }
-        
-        .grid-item:hover i {
-            color: #ff00ff;
-        }
-        
-        .grid-item span {
-            font-size: 0.9rem;
             text-align: center;
         }
         
-        /* === STATUS MESSAGE === */
+        /* === FORM ELEMENTS === */
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 1rem;
+            background: rgba(20, 25, 30, 0.7);
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .search-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-btn {
+            padding: 12px;
+            background: rgba(0, 255, 204, 0.2);
+            border: 2px solid #00ffcc;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .search-btn:hover {
+            background: rgba(0, 255, 204, 0.4);
+            transform: translateY(-3px);
+        }
+        
+        /* === RESULTS SECTION === */
+        .result-container {
+            margin-top: 1.5rem;
+            display: none;
+        }
+        
+        .result-item {
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .thumbnail {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+        
+        .video-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+        
+        .video-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .download-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .download-btn {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .download-video {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            color: #ff6b6b;
+        }
+        
+        .download-video:hover {
+            background: rgba(255, 0, 0, 0.3);
+        }
+        
+        .download-audio {
+            background: rgba(0, 128, 0, 0.2);
+            border: 1px solid #00aa00;
+            color: #6bff6b;
+        }
+        
+        .download-audio:hover {
+            background: rgba(0, 128, 0, 0.3);
+        }
+        
+        /* Preview Player */
+        .preview-container {
+            margin-top: 1.5rem;
+            display: none;
+        }
+        
+        .preview-player {
+            width: 100%;
+            border-radius: 8px;
+            background: rgba(20, 25, 30, 0.8);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .preview-thumbnail {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .preview-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .preview-controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #00ffcc;
+            border-radius: 5px;
+            width: 0%;
+        }
+        
+        .time-display {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .control-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .control-btn:hover {
+            color: #00ffcc;
+            transform: scale(1.1);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid rgba(0, 255, 204, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #00ffcc;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Status Message */
         .status-message {
             padding: 1rem;
             margin: 1rem 0;
             border-radius: 10px;
             font-size: 0.9rem;
+            display: none;
+            text-align: center;
         }
         
         .status-success {
@@ -252,33 +375,16 @@
             color: #00ffcc;
         }
         
-        .status-warning {
-            background: rgba(255, 204, 0, 0.1);
-            border: 1px solid #ffcc00;
-            color: #ffcc00;
-        }
-        
         .status-error {
-            background: rgba(255, 51, 51, 0.1);
-            border: 1px solid #ff3333;
-            color: #ff3333;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            color: #ff6b6b;
         }
         
-        .status-info {
-            background: rgba(51, 153, 255, 0.1);
-            border: 1px solid #3399ff;
-            color: #3399ff;
-        }
-        
-        /* === ANIMATIONS === */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* === RESPONSIVE === */
+        /* Responsive Adjustments */
         @media (max-width: 768px) {
             .container {
+                width: 95%;
                 padding: 1.5rem;
             }
             
@@ -286,183 +392,413 @@
                 font-size: 1.8rem;
             }
             
-            .grid-container {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            .search-buttons, .download-buttons {
+                grid-template-columns: 1fr;
             }
             
             .menu {
                 width: 250px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            h1 {
-                font-size: 1.6rem;
-            }
-            
-            .grid-item {
-                padding: 0.8rem;
-            }
-            
-            .grid-item i {
-                font-size: 1.8rem;
-            }
-            
-            .grid-item span {
-                font-size: 0.8rem;
-            }
-            
-            .menu {
-                width: 220px;
-                padding-top: 70px;
-            }
-            
-            .menu-toggle {
-                top: 20px;
-                left: 20px;
-                width: 28px;
+                left: -250px;
             }
         }
     </style>
 </head>
 <body>
-    <video autoplay muted loop id="bgVideo">
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-network-of-lines-in-motion-1638-large.mp4" type="video/mp4">
+    <!-- Background Video -->
+    <video id="bgVideo" autoplay muted loop>
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-digital-grid-with-lines-854-large.mp4" type="video/mp4">
     </video>
-
+    
     <!-- Menu Toggle -->
-    <div class="menu-toggle">
+    <div class="menu-toggle" id="menuToggle">
         <span></span>
         <span></span>
         <span></span>
     </div>
-
+    
     <!-- Side Menu -->
-    <div class="menu">
+    <div class="menu" id="menu">
         <ul>
-            <li><a href="#" class="active">Home</a></li>
-            <li class="menu-category">AI Services</li>
-            <li><a href="ai/openai.html">OpenAI Chat</a></li>
-            <li><a href="ai/gemini.html">Gemini AI</a></li>
-            <li><a href="ai/llama.html">LLaMA AI</a></li>
-            <li><a href="ai/image-analysis.html">Image Analysis</a></li>
-            
-            <li class="menu-category">Downloaders</li>
-            <li><a href="downloaders/facebook.html">Facebook Downloader</a></li>
-            <li><a href="downloaders/tiktok.html">TikTok Downloader</a></li>
-            <li><a href="downloaders/instagram.html">Instagram Downloader</a></li>
-            <li><a href="downloaders/youtube.html">YouTube Downloader</a></li>
-            <li><a href="downloaders/apk.html">APK Downloader</a></li>
-            
-            <li class="menu-category">Creative Tools</li>
-            <li><a href="tools/logo-maker.html">Logo Maker</a></li>
-            <li><a href="tools/url-shortener.html">URL Shortener</a></li>
-            <li><a href="tools/text-effects.html">Text Effects</a></li>
+            <li class="menu-category">NAVIGATION</li>
+            <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#"><i class="fas fa-history"></i> History</a></li>
+            <li><a href="#"><i class="fas fa-download"></i> Downloads</a></li>
+            <li class="menu-category">SETTINGS</li>
+            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="#"><i class="fas fa-info-circle"></i> About</a></li>
         </ul>
     </div>
-
-    <!-- Main Content -->
+    
+    <!-- Main Container -->
     <div class="container">
-        <h1>API Services Hub</h1>
-        <p class="subtitle">Access all web services in one place</p>
+        <h1><i class="fab fa-youtube"></i> Mini YouTube</h1>
+        <p class="subtitle">Search and download your favorite YouTube content</p>
         
-        <div class="quick-access">
-            <h3>Quick Access</h3>
-            <div class="grid-container">
-                <a href="downloaders/facebook.html" class="grid-item">
-                    <i class="fab fa-facebook"></i>
-                    <span>Facebook Downloader</span>
-                </a>
-                <a href="downloaders/tiktok.html" class="grid-item">
-                    <i class="fab fa-tiktok"></i>
-                    <span>TikTok Downloader</span>
-                </a>
-                <a href="ai/openai.html" class="grid-item">
-                    <i class="fas fa-robot"></i>
-                    <span>AI Chat</span>
-                </a>
-                <a href="downloaders/apk.html" class="grid-item">
-                    <i class="fas fa-download"></i>
-                    <span>APK Downloader</span>
-                </a>
+        <!-- Search Form -->
+        <input type="text" id="searchInput" placeholder="Enter video name or URL...">
+        
+        <div class="search-buttons">
+            <button class="search-btn" id="searchVideoBtn">
+                <i class="fas fa-video"></i> Search Video
+            </button>
+            <button class="search-btn" id="searchAudioBtn">
+                <i class="fas fa-music"></i> Search Audio
+            </button>
+        </div>
+        
+        <!-- Loading Spinner -->
+        <div class="spinner" id="loadingSpinner"></div>
+        
+        <!-- Status Message -->
+        <div class="status-message" id="statusMessage"></div>
+        
+        <!-- Results Container -->
+        <div class="result-container" id="resultContainer">
+            <div class="result-item">
+                <img src="" alt="Video thumbnail" class="thumbnail" id="resultThumbnail">
+                <h3 class="video-title" id="resultTitle"></h3>
+                <div class="video-details">
+                    <span class="detail-item"><i class="far fa-clock"></i> <span id="resultDuration"></span></span>
+                    <span class="detail-item"><i class="fas fa-user"></i> <span id="resultChannel"></span></span>
+                    <span class="detail-item"><i class="fas fa-eye"></i> <span id="resultViews"></span></span>
+                </div>
+                
+                <div class="download-buttons">
+                    <button class="download-btn download-video" id="downloadVideoBtn">
+                        <i class="fas fa-download"></i> Video
+                    </button>
+                    <button class="download-btn download-audio" id="downloadAudioBtn">
+                        <i class="fas fa-download"></i> Audio
+                    </button>
+                </div>
+                
+                <div class="form-control" style="margin-top: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="previewCheckbox"> 
+                        <span>Preview First</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preview Player -->
+        <div class="preview-container" id="previewContainer">
+            <div class="preview-player">
+                <img src="" alt="Preview thumbnail" class="preview-thumbnail" id="previewThumbnail">
+                <h4 class="preview-title" id="previewTitle"></h4>
+                
+                <div class="preview-controls">
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span id="totalTime">0:00</span>
+                    </div>
+                    <div class="control-buttons">
+                        <button class="control-btn" id="playPauseBtn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn" id="stopBtn"><i class="fas fa-stop"></i></button>
+                        <button class="control-btn" id="volumeBtn"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         // Menu Toggle
-        document.querySelector('.menu-toggle').addEventListener('click', function() {
-            document.querySelector('.menu').classList.toggle('active');
-            this.querySelectorAll('span').forEach(span => {
-                span.classList.toggle('active');
-            });
+        const menuToggle = document.getElementById('menuToggle');
+        const menu = document.getElementById('menu');
+        
+        menuToggle.addEventListener('click', () => {
+            menu.classList.toggle('active');
+            menuToggle.classList.toggle('active');
         });
-
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const menu = document.querySelector('.menu');
-            const menuToggle = document.querySelector('.menu-toggle');
-            
-            if (!menu.contains(event.target) && !menuToggle.contains(event.target)) {
-                menu.classList.remove('active');
-                menuToggle.querySelectorAll('span').forEach(span => {
-                    span.classList.remove('active');
-                });
+        
+        // Variables to store search results
+        let currentResult = null;
+        let audioPlayer = new Audio();
+        let isPlaying = false;
+        let isPreviewChecked = false;
+        
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const searchVideoBtn = document.getElementById('searchVideoBtn');
+        const searchAudioBtn = document.getElementById('searchAudioBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        // Result elements
+        const resultThumbnail = document.getElementById('resultThumbnail');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultDuration = document.getElementById('resultDuration');
+        const resultChannel = document.getElementById('resultChannel');
+        const resultViews = document.getElementById('resultViews');
+        const downloadVideoBtn = document.getElementById('downloadVideoBtn');
+        const downloadAudioBtn = document.getElementById('downloadAudioBtn');
+        const previewCheckbox = document.getElementById('previewCheckbox');
+        
+        // Preview elements
+        const previewContainer = document.getElementById('previewContainer');
+        const previewThumbnail = document.getElementById('previewThumbnail');
+        const previewTitle = document.getElementById('previewTitle');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const totalTimeDisplay = document.getElementById('totalTime');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const volumeBtn = document.getElementById('volumeBtn');
+        
+        // Event Listeners
+        searchVideoBtn.addEventListener('click', () => searchContent('video'));
+        searchAudioBtn.addEventListener('click', () => searchContent('audio'));
+        downloadVideoBtn.addEventListener('click', downloadVideo);
+        downloadAudioBtn.addEventListener('click', downloadAudio);
+        previewCheckbox.addEventListener('change', togglePreview);
+        
+        // Player controls
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        stopBtn.addEventListener('click', stopAudio);
+        volumeBtn.addEventListener('click', toggleMute);
+        progressContainer.addEventListener('click', seekAudio);
+        
+        // Update progress bar while playing
+        audioPlayer.addEventListener('timeupdate', updateProgressBar);
+        audioPlayer.addEventListener('loadedmetadata', () => {
+            totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+        });
+        audioPlayer.addEventListener('ended', () => {
+            isPlaying = false;
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        });
+        
+        // Search function
+        async function searchContent(type) {
+            const query = searchInput.value.trim();
+            if (!query) {
+                showStatus('Please enter a search term', 'error');
+                return;
             }
-        });
-
-        // API Call Function
-        async function callAPI(endpoint, params, method = 'GET') {
+            
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+            resultContainer.style.display = 'none';
+            statusMessage.style.display = 'none';
+            
             try {
-                let url = endpoint;
-                if (method === 'GET' && params) {
-                    url += '?' + new URLSearchParams(params).toString();
-                }
+                // In a real app, you would call your API here
+                // For demo purposes, we'll simulate a response
+                await simulateSearch(type, query);
                 
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: method !== 'GET' ? JSON.stringify(params) : null
-                });
+                // Display results
+                displayResult();
+                showStatus('Search completed successfully', 'success');
                 
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    return await response.json();
-                } else {
-                    return await response.text();
+                // Check if preview is enabled
+                if (isPreviewChecked && type === 'audio') {
+                    startPreview();
                 }
             } catch (error) {
-                console.error('API Call Failed:', error);
-                throw error;
+                showStatus(error.message, 'error');
+            } finally {
+                loadingSpinner.style.display = 'none';
             }
         }
-
-        // Status Message Display
-        function showStatus(message, type = 'info', duration = 3000) {
-            const statusDiv = document.createElement('div');
-            statusDiv.className = `status-message status-${type}`;
-            statusDiv.textContent = message;
-            
-            const container = document.querySelector('.container') || document.body;
-            container.appendChild(statusDiv);
-            
-            if (duration > 0) {
+        
+        // Simulate API call (replace with actual fetch in production)
+        function simulateSearch(type, query) {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    statusDiv.remove();
-                }, duration);
-            }
-            
-            return statusDiv;
+                    // Mock data based on the image provided
+                    if (query.toLowerCase().includes('laal pari') || query.toLowerCase().includes('honey singh')) {
+                        currentResult = {
+                            type: type,
+                            title: "LAAL PARI (song): Yo Yo Honey Singh | Sajid Nadiadwala | Tarun Mansukhani | Houseful!",
+                            thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+                            duration: "3:05",
+                            channel: "T-Series",
+                            views: "2,227,013",
+                            videoUrl: "https://example.com/video.mp4",
+                            audioUrl: "https://example.com/audio.mp3",
+                            previewUrl: "https://example.com/preview.mp3"
+                        };
+                        resolve();
+                    } else if (query) {
+                        // Generic response for other queries
+                        currentResult = {
+                            type: type,
+                            title: query + " - Official Video",
+                            thumbnail: "https://i.ytimg.com/vi/9bZkp7q19f0/maxresdefault.jpg",
+                            duration: "4:20",
+                            channel: "Popular Channel",
+                            views: "1,000,000+",
+                            videoUrl: `https://apis.davidcyriltech.my.id/download/ytmp4?url=${encodeURIComponent(query)}`,
+                            audioUrl: `https://apis.davidcyriltech.my.id/download/ytmp3?url=${encodeURIComponent(query)}`,
+                            previewUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+                        };
+                        resolve();
+                    } else {
+                        reject(new Error("No results found for your search"));
+                    }
+                }, 1500);
+            });
         }
+        
+        // Display search results
+        function displayResult() {
+            if (!currentResult) return;
+            
+            resultThumbnail.src = currentResult.thumbnail;
+            resultTitle.textContent = currentResult.title;
+            resultDuration.textContent = currentResult.duration;
+            resultChannel.textContent = currentResult.channel;
+            resultViews.textContent = currentResult.views;
+            
+            // Update preview elements too
+            previewThumbnail.src = currentResult.thumbnail;
+            previewTitle.textContent = currentResult.title;
+            
+            resultContainer.style.display = 'block';
+        }
+        
+        // Download functions
+        function downloadVideo() {
+            if (!currentResult) return;
+            
+            showStatus('Preparing video download...', 'success');
+            
+            // In a real app, this would redirect to your API endpoint
+            // For demo, we'll simulate a download
+            setTimeout(() => {
+                const link = document.createElement('a');
+                link.href = currentResult.videoUrl;
+                link.download = currentResult.title + '.mp4';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatus('Video download started', 'success');
+            }, 1000);
+        }
+        
+        function downloadAudio() {
+            if (!currentResult) return;
+            
+            showStatus('Preparing audio download...', 'success');
+            
+            // In a real app, this would redirect to your API endpoint
+            // For demo, we'll simulate a download
+            setTimeout(() => {
+                const link = document.createElement('a');
+                link.href = currentResult.audioUrl;
+                link.download = currentResult.title + '.mp3';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatus('Audio download started', 'success');
+            }, 1000);
+        }
+        
+        // Preview functions
+        function togglePreview() {
+            isPreviewChecked = previewCheckbox.checked;
+            
+            if (isPreviewChecked && currentResult && currentResult.type === 'audio') {
+                startPreview();
+            } else {
+                stopPreview();
+            }
+        }
+        
+        function startPreview() {
+            if (!currentResult) return;
+            
+            // Set audio source
+            audioPlayer.src = currentResult.previewUrl;
+            previewContainer.style.display = 'block';
+            
+            // Scroll to preview
+            previewContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function stopPreview() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            isPlaying = false;
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            progressBar.style.width = '0%';
+            currentTimeDisplay.textContent = '0:00';
+            previewContainer.style.display = 'none';
+        }
+        
+        // Player control functions
+        function togglePlayPause() {
+            if (isPlaying) {
+                audioPlayer.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            } else {
+                audioPlayer.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            }
+            isPlaying = !isPlaying;
+        }
+        
+        function stopAudio() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            isPlaying = false;
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            progressBar.style.width = '0%';
+            currentTimeDisplay.textContent = '0:00';
+        }
+        
+        function toggleMute() {
+            audioPlayer.muted = !audioPlayer.muted;
+            volumeBtn.innerHTML = audioPlayer.muted ? 
+                '<i class="fas fa-volume-mute"></i>' : 
+                '<i class="fas fa-volume-up"></i>';
+        }
+        
+        function seekAudio(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audioPlayer.duration;
+            audioPlayer.currentTime = (clickX / width) * duration;
+        }
+        
+        function updateProgressBar() {
+            const { currentTime, duration } = audioPlayer;
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            currentTimeDisplay.textContent = formatTime(currentTime);
+        }
+        
+        // Helper functions
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.style.display = 'block';
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // For demo purposes, pre-fill the search with the example from the image
+            searchInput.value = "LAAL PARI Yo Yo Honey Singh";
+        });
     </script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
-    </html>
+</html>
