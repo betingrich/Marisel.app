@@ -186,7 +186,120 @@
             font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
-            Trunkated for brevity... (The rest of the CSS remains identical to the provided template)
+            transition: all 0.3s ease;
+        }
+        
+        #searchBtn:hover {
+            background: rgba(0, 255, 204, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* === RESULTS SECTION === */
+        .result-container {
+            margin-top: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .video-preview {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 2px solid rgba(0, 255, 204, 0.5);
+        }
+        
+        .video-info {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(20, 25, 30, 0.5);
+            border-radius: 10px;
+        }
+        
+        .video-info h3 {
+            color: #00ffcc;
+            margin-bottom: 0.5rem;
+        }
+        
+        .download-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .download-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: rgba(0, 255, 204, 0.2);
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            background: rgba(0, 255, 204, 0.4);
+            transform: translateY(-3px);
+        }
+        
+        .status-message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .status-success {
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid #00ffcc;
+            color: #00ffcc;
+        }
+        
+        .status-error {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid #ff3333;
+            color: #ff3333;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+            color: rgba(0, 255, 204, 0.8);
+        }
+        
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .download-options {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -296,6 +409,9 @@
         const videoAuthor = document.getElementById('videoAuthor');
         const videoYear = document.getElementById('videoYear');
         
+        // YouTube Data API Key (Replace with your own key)
+        const API_KEY = 'YOUR_YOUTUBE_API_KEY'; // Get from https://console.developers.google.com
+        
         // Show status message
         function showStatus(message, type = 'error') {
             statusMessage.textContent = message;
@@ -318,39 +434,47 @@
                 return;
             }
             
+            if (!API_KEY || API_KEY === 'YOUR_YOUTUBE_API_KEY') {
+                showStatus('Please configure a valid YouTube API key', 'error');
+                return;
+            }
+            
             // Show loading, hide results and previous status
             loading.style.display = 'block';
             resultContainer.style.display = 'none';
             hideStatus();
             
             try {
-                // Search using the provided API
-                const searchApiUrl = `https://apis.davidcyriltech.my.id/play?query=${encodeURIComponent(query)}`;
+                // Search using YouTube Data API v3
+                const searchApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1&key=${API_KEY}`;
                 const searchResponse = await fetch(searchApiUrl);
                 
                 if (!searchResponse.ok) {
-                    throw new Error(`Search API Error: ${searchResponse.status}`);
+                    throw new Error(`YouTube API Error: ${searchResponse.status}`);
                 }
                 
                 const searchData = await searchResponse.json();
                 
-                if (!searchData.results || searchData.results.length === 0) {
-                    throw new Error('No results found for the query');
+                if (!searchData.items || searchData.items.length === 0) {
+                    throw new Error('No videos found for the query');
                 }
                 
                 // Get the first result
-                const video = searchData.results[0];
+                const video = searchData.items[0].snippet;
+                const videoId = searchData.items[0].id.videoId;
                 
                 // Display video info
-                videoThumbnail.src = video.thumbnail || 'https://via.placeholder.com/600x400';
+                videoThumbnail.src = video.thumbnails.high.url || 'https://via.placeholder.com/600x400';
                 videoTitle.textContent = video.title || 'Unknown Title';
-                videoAuthor.textContent = `By ${video.artist || 'Unknown Artist'}`;
-                videoYear.textContent = `Published: ${video.year || 'Unknown'}`;
+                videoAuthor.textContent = `By ${video.channelTitle || 'Unknown Artist'}`;
+                videoYear.textContent = `Published: ${new Date(video.publishedAt).getFullYear() || 'Unknown'}`;
                 
-                // Set download links
-                const videoUrl = video.url || `https://youtube.com/watch?v=${video.videoId}`;
-                mp3Download.href = `https://apis.davidcyriltech.my.id/download/ytmp3?url=${encodeURIComponent(videoUrl)}`;
-                mp4Download.href = `https://apis.davidcyriltech.my.id/download/ytmp4?url=${encodeURIComponent(videoUrl)}`;
+                // Placeholder for download links (replace with a working downloader API)
+                const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                mp3Download.href = '#'; // Replace with: `https://your-downloader-api/mp3?url=${encodeURIComponent(videoUrl)}`
+                mp4Download.href = '#'; // Replace with: `https://your-downloader-api/mp4?url=${encodeURIComponent(videoUrl)}`
+                mp3Download.textContent = 'Download MP3 (Unavailable)';
+                mp4Download.textContent = 'Download MP4 (Unavailable)';
                 
                 // Show download buttons based on format
                 mp3Download.style.display = format === 'mp3' ? 'block' : 'none';
@@ -374,4 +498,4 @@
         });
     </script>
 </body>
-  </html>
+</html>
