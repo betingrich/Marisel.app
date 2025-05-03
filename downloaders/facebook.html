@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Video Downloader</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .result-container {
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .video-preview {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .download-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .download-btn {
+            flex: 1;
+            background: rgba(0, 255, 204, 0.2);
+        }
+        
+        .download-btn:hover {
+            background: rgba(0, 255, 204, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop id="bgVideo">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-network-of-lines-in-motion-1638-large.mp4" type="video/mp4">
+    </video>
+
+    <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="menu">
+        <ul>
+            <li><a href="../index.html">← Back to Home</a></li>
+            <li class="menu-category">Downloaders</li>
+            <li><a href="#" class="active">Facebook Downloader</a></li>
+            <li><a href="tiktok.html">TikTok Downloader</a></li>
+            <li><a href="instagram.html">Instagram Downloader</a></li>
+            <li><a href="youtube.html">YouTube Downloader</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1>Facebook Video Downloader</h1>
+        <p class="subtitle">Download videos from Facebook in HD quality</p>
+        
+        <input type="text" id="fbUrl" placeholder="Paste Facebook video URL here...">
+        <button id="downloadBtn">Fetch Video</button>
+        
+        <div class="result-container" id="resultContainer">
+            <h3>Download Options</h3>
+            <video controls class="video-preview" id="videoPreview"></video>
+            <div class="download-options">
+                <button class="download-btn" id="hdDownload">Download HD</button>
+                <button class="download-btn" id="sdDownload">Download SD</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', async function() {
+            const url = document.getElementById('fbUrl').value.trim();
+            if (!url) {
+                showStatus('Please enter a Facebook video URL', 'error');
+                return;
+            }
+            
+            showStatus('Fetching video info...', 'info');
+            
+            try {
+                // Using the API you provided: bk9.fun/download/fb?url=
+                const apiUrl = 'https://bk9.fun/download/fb';
+                const response = await callAPI(apiUrl, { url });
+                
+                if (response.status === 'success') {
+                    const videoPreview = document.getElementById('videoPreview');
+                    const hdBtn = document.getElementById('hdDownload');
+                    const sdBtn = document.getElementById('sdDownload');
+                    
+                    // Show HD version by default
+                    const hdLink = response.downloads.find(d => d.quality === 'HD')?.url;
+                    videoPreview.src = hdLink || response.downloads[0].url;
+                    
+                    // Set download buttons
+                    hdBtn.onclick = () => window.open(hdLink || response.downloads[0].url, '_blank');
+                    sdBtn.onclick = () => {
+                        const sdLink = response.downloads.find(d => d.quality === 'SD')?.url;
+                        window.open(sdLink || response.downloads[1]?.url || response.downloads[0].url, '_blank');
+                    };
+                    
+                    document.getElementById('resultContainer').style.display = 'block';
+                    showStatus('Video loaded successfully!', 'success');
+                } else {
+                    showStatus(response.message || 'Failed to fetch video', 'error');
+                }
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>
