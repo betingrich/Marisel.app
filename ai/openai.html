@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* === BASE STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        
+        #bgVideo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            object-fit: cover;
+            filter: brightness(0.6);
+        }
+        
+        /* === MENU STYLES === */
+        .menu-toggle {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            width: 32px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .menu-toggle span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background: #00ffcc;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(0, 255, 204, 0.7);
+        }
+        
+        .menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: rgba(10, 15, 20, 0.98);
+            transition: all 0.4s ease;
+            z-index: 999;
+            padding-top: 80px;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.7);
+            border-right: 1px solid rgba(0, 255, 204, 0.5);
+        }
+        
+        .menu.active {
+            left: 0;
+        }
+        
+        .menu ul {
+            list-style: none;
+            padding: 0 25px;
+        }
+        
+        .menu ul li {
+            margin: 22px 0;
+        }
+        
+        .menu ul li a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: block;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid transparent;
+        }
+        
+        .menu ul li a:hover {
+            background: rgba(0, 255, 204, 0.15);
+            color: #00ffcc;
+            transform: translateX(10px);
+            border-left: 3px solid #00ffcc;
+        }
+        
+        .menu-category {
+            color: #ff00ff;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 0, 255, 0.3);
+        }
+        
+        /* === CHAT CONTAINER === */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            margin: 5vh auto;
+            padding: 2rem;
+            background: rgba(10, 10, 20, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 255, 204, 0.7);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: #00ffcc;
+            text-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(20, 25, 30, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .user-message {
+            background: rgba(0, 255, 204, 0.2);
+            margin-left: auto;
+            border: 1px solid rgba(0, 255, 204, 0.5);
+        }
+        
+        .ai-message {
+            background: rgba(255, 0, 255, 0.1);
+            margin-right: auto;
+            border: 1px solid rgba(255, 0, 255, 0.3);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        #userInput {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(20, 25, 30, 0.7);
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        #userInput:focus {
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+        
+        #sendBtn {
+            padding: 0 1.5rem;
+            background: rgba(0, 255, 204, 0.3);
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #sendBtn:hover {
+            background: rgba(0, 255, 204, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .typing-indicator {
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* === STATUS MESSAGES === */
+        .status-message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .status-error {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid #ff3333;
+            color: #ff3333;
+            display: block;
+        }
+        
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                height: 85vh;
+                margin: 2.5vh auto;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop id="bgVideo">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-network-of-lines-in-motion-1638-large.mp4" type="video/mp4">
+    </video>
+
+    <!-- Menu Toggle -->
+    <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Side Menu -->
+    <div class="menu">
+        <ul>
+            <li><a href="../index.html">← Back to Home</a></li>
+            <li class="menu-category">AI Services</li>
+            <li><a href="#" class="active">OpenAI Chat</a></li>
+            <li><a href="gemini.html">Gemini AI</a></li>
+            <li><a href="llama.html">LLaMA AI</a></li>
+            <li><a href="image-analysis.html">Image Analysis</a></li>
+            
+            <li class="menu-category">Downloaders</li>
+            <li><a href="../downloaders/facebook.html">Facebook Downloader</a></li>
+            <li><a href="../downloaders/tiktok.html">TikTok Downloader</a></li>
+            <li><a href="../downloaders/instagram.html">Instagram Downloader</a></li>
+            <li><a href="../downloaders/youtube.html">YouTube Downloader</a></li>
+            <li><a href="../downloaders/apk.html">APK Downloader</a></li>
+            
+            <li class="menu-category">Creative Tools</li>
+            <li><a href="../tools/logo-maker.html">Logo Maker</a></li>
+            <li><a href="../tools/url-shortener.html">URL Shortener</a></li>
+            <li><a href="../tools/text-effects.html">Text Effects</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>OpenAI Chat</h1>
+        <p class="subtitle">Powered by vapis.my.id API</p>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="message ai-message">
+                Hello! I'm an AI assistant powered by OpenAI. How can I help you today?
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            AI is typing...
+        </div>
+        
+        <div class="status-message" id="statusMessage"></div>
+        
+        <div class="input-group">
+            <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off">
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // Menu Toggle
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.menu').classList.toggle('active');
+            this.querySelectorAll('span').forEach(span => {
+                span.classList.toggle('active');
+            });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.menu');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!menu.contains(event.target) && !menuToggle.contains(event.target)) {
+                menu.classList.remove('active');
+                menuToggle.querySelectorAll('span').forEach(span => {
+                    span.classList.remove('active');
+                });
+            }
+        });
+        
+        // Chat functionality
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        // Add message to chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Show status message
+        function showStatus(message, type = 'error') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.style.display = 'block';
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Send message to API
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            // Show typing indicator
+            typingIndicator.style.display = 'block';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            try {
+                // Call OpenAI API (vapis.my.id/api/openai)
+                const apiUrl = `https://vapis.my.id/api/openai?q=${encodeURIComponent(message)}`;
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                
+                const data = await response.text();
+                
+                // Add AI response to chat
+                addMessage(data, 'ai');
+            } catch (error) {
+                showStatus(`Error: ${error.message}`);
+                addMessage("Sorry, I encountered an error. Please try again.", 'ai');
+            } finally {
+                typingIndicator.style.display = 'none';
+            }
+        }
+        
+        // Event listeners
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+              </html>
