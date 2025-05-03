@@ -4,7 +4,330 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Hub - All Services</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* === BASE STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        
+        #bgVideo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            object-fit: cover;
+            filter: brightness(0.6);
+        }
+        
+        /* === MENU STYLES === */
+        .menu-toggle {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            width: 32px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .menu-toggle span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background: #00ffcc;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(0, 255, 204, 0.7);
+        }
+        
+        .menu-toggle:hover span {
+            background: #ff00ff;
+            box-shadow: 0 0 8px rgba(255, 0, 255, 0.8);
+        }
+        
+        .menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: rgba(10, 15, 20, 0.98);
+            transition: all 0.4s ease;
+            z-index: 999;
+            padding-top: 80px;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.7);
+            border-right: 1px solid rgba(0, 255, 204, 0.5);
+        }
+        
+        .menu.active {
+            left: 0;
+        }
+        
+        .menu ul {
+            list-style: none;
+            padding: 0 25px;
+        }
+        
+        .menu ul li {
+            margin: 22px 0;
+        }
+        
+        .menu ul li a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: block;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid transparent;
+        }
+        
+        .menu ul li a:hover {
+            background: rgba(0, 255, 204, 0.15);
+            color: #00ffcc;
+            transform: translateX(10px);
+            border-left: 3px solid #00ffcc;
+        }
+        
+        .menu ul li a.active {
+            background: rgba(0, 255, 204, 0.2);
+            color: #00ffcc;
+            border-left: 3px solid #00ffcc;
+        }
+        
+        .menu-category {
+            color: #ff00ff;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 0, 255, 0.3);
+            font-size: 1.2rem;
+        }
+        
+        /* External link arrows */
+        .menu ul li a[target="_blank"]::after {
+            content: " ↗";
+            font-size: 0.9em;
+            color: rgba(0, 255, 204, 0.8);
+            margin-left: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu ul li a[target="_blank"]:hover::after {
+            color: #ff00ff;
+            transform: translateX(3px);
+        }
+        
+        /* Special menu link colors */
+        .menu ul li a[href^="https://wa.me"],
+        .menu ul li a[href^="https://whatsapp.com"] {
+            color: #25D366;
+            border-left: 3px solid rgba(37, 211, 102, 0.3);
+        }
+        
+        .menu ul li a[href^="https://wa.me"]:hover,
+        .menu ul li a[href^="https://whatsapp.com"]:hover {
+            background: rgba(37, 211, 102, 0.15);
+            border-left: 3px solid #25D366;
+        }
+        
+        .menu ul li a[href^="https://jiod"] {
+            color: #00ccff;
+            border-left: 3px solid rgba(0, 204, 255, 0.3);
+        }
+        
+        .menu ul li a[href^="https://jiod"]:hover {
+            background: rgba(0, 204, 255, 0.15);
+            border-left: 3px solid #00ccff;
+        }
+        
+        /* === MAIN CONTAINER === */
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 5vh auto;
+            padding: 2rem;
+            background: rgba(10, 10, 20, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 255, 204, 0.7);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: #00ffcc;
+            text-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* === QUICK ACCESS GRID === */
+        .quick-access {
+            margin-top: 2rem;
+        }
+        
+        .quick-access h3 {
+            font-size: 1.5rem;
+            color: #00ffcc;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+        
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(20, 25, 30, 0.7);
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .grid-item:hover {
+            background: rgba(0, 255, 204, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 204, 0.3);
+        }
+        
+        .grid-item i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #00ffcc;
+            transition: all 0.3s ease;
+        }
+        
+        .grid-item:hover i {
+            color: #ff00ff;
+        }
+        
+        .grid-item span {
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        /* === STATUS MESSAGE === */
+        .status-message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .status-success {
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid #00ffcc;
+            color: #00ffcc;
+        }
+        
+        .status-warning {
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid #ffcc00;
+            color: #ffcc00;
+        }
+        
+        .status-error {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid #ff3333;
+            color: #ff3333;
+        }
+        
+        .status-info {
+            background: rgba(51, 153, 255, 0.1);
+            border: 1px solid #3399ff;
+            color: #3399ff;
+        }
+        
+        /* === ANIMATIONS === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .grid-container {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+            
+            .menu {
+                width: 250px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .grid-item {
+                padding: 0.8rem;
+            }
+            
+            .grid-item i {
+                font-size: 1.8rem;
+            }
+            
+            .grid-item span {
+                font-size: 0.8rem;
+            }
+            
+            .menu {
+                width: 220px;
+                padding-top: 70px;
+            }
+            
+            .menu-toggle {
+                top: 20px;
+                left: 20px;
+                width: 28px;
+            }
+        }
+    </style>
 </head>
 <body>
     <video autoplay muted loop id="bgVideo">
@@ -70,7 +393,76 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Menu Toggle
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.menu').classList.toggle('active');
+            this.querySelectorAll('span').forEach(span => {
+                span.classList.toggle('active');
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.menu');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!menu.contains(event.target) && !menuToggle.contains(event.target)) {
+                menu.classList.remove('active');
+                menuToggle.querySelectorAll('span').forEach(span => {
+                    span.classList.remove('active');
+                });
+            }
+        });
+
+        // API Call Function
+        async function callAPI(endpoint, params, method = 'GET') {
+            try {
+                let url = endpoint;
+                if (method === 'GET' && params) {
+                    url += '?' + new URLSearchParams(params).toString();
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: method !== 'GET' ? JSON.stringify(params) : null
+                });
+                
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return await response.json();
+                } else {
+                    return await response.text();
+                }
+            } catch (error) {
+                console.error('API Call Failed:', error);
+                throw error;
+            }
+        }
+
+        // Status Message Display
+        function showStatus(message, type = 'info', duration = 3000) {
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.textContent = message;
+            
+            const container = document.querySelector('.container') || document.body;
+            container.appendChild(statusDiv);
+            
+            if (duration > 0) {
+                setTimeout(() => {
+                    statusDiv.remove();
+                }, duration);
+            }
+            
+            return statusDiv;
+        }
+    </script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
-                              </html>
+    </html>
