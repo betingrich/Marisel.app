@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Chat</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .chat-container {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(20, 25, 30, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background: rgba(0, 255, 204, 0.2);
+            margin-left: auto;
+            border: 1px solid rgba(0, 255, 204, 0.5);
+        }
+        
+        .ai-message {
+            background: rgba(255, 0, 255, 0.1);
+            margin-right: auto;
+            border: 1px solid rgba(255, 0, 255, 0.3);
+        }
+        
+        #userInput {
+            margin-bottom: 0;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .input-group button {
+            width: auto;
+            padding: 0 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop id="bgVideo">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-network-of-lines-in-motion-1638-large.mp4" type="video/mp4">
+    </video>
+
+    <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="menu">
+        <ul>
+            <li><a href="../index.html">← Back to Home</a></li>
+            <li class="menu-category">AI Services</li>
+            <li><a href="openai.html">OpenAI Chat</a></li>
+            <li><a href="#" class="active">Gemini AI</a></li>
+            <li><a href="llama.html">LLaMA AI</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1>Gemini AI</h1>
+        <p class="subtitle">Powered by Google's Gemini Pro</p>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="message ai-message">
+                Hello! I'm Gemini AI. How can I help you today?
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <input type="text" id="userInput" placeholder="Type your message...">
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            try {
+                // Using the API you provided: api.siputzx.my.id/api/ai/gemini-pro?content=
+                const apiUrl = 'https://api.siputzx.my.id/api/ai/gemini-pro';
+                const response = await callAPI(apiUrl, { content: message });
+                
+                // Add AI response to chat
+                addMessage(typeof response === 'string' ? response : response.response, 'ai');
+            } catch (error) {
+                addMessage("Sorry, I couldn't process your request. Please try again.", 'ai');
+                console.error(error);
+            }
+        }
+        
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
