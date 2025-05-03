@@ -108,6 +108,7 @@
             font-weight: bold;
             margin-top: 1.5rem;
             padding: 0.5rem 1rem;
+            border-bottom: 1pxexpectoration: 0px 0px 0px 0px 0px;
             border-bottom: 1px solid rgba(255, 0, 255, 0.3);
         }
         
@@ -341,13 +342,13 @@
     <!-- Main Content -->
     <div class="container">
         <h1>TikTok Downloader</h1>
-        <p class="subtitle">Download videos without watermark</p>
+        <p class="subtitle">Download videos with or without watermark</p>
         
         <div class="input-group">
             <input type="text" id="tiktokUrl" placeholder="Paste TikTok video URL here">
             <select id="apiVersion">
-                <option value="tiktok">With Watermark</option>
-                <option value="tiktok2">No Watermark</option>
+                <option value="watermark">With Watermark</option>
+                <option value="no-watermark">No Watermark</option>
             </select>
         </div>
         
@@ -446,8 +447,8 @@
             hideStatus();
             
             try {
-                // Using bk9.fun API
-                const apiUrl = `https://bk9.fun/download/${version}?url=${encodeURIComponent(url)}`;
+                // Using the new API
+                const apiUrl = `https://apis.davidcyriltech.my.id/download/tiktok?url=${encodeURIComponent(url)}`;
                 
                 // Fetch video info
                 const response = await fetch(apiUrl);
@@ -456,28 +457,40 @@
                     throw new Error(`API Error: ${response.status}`);
                 }
                 
-                // Check content type
-                const contentType = response.headers.get('content-type');
+                // Parse JSON response
+                const data = await response.json();
                 
-                if (contentType.includes('application/json')) {
-                    // JSON response (multiple quality options)
-                    const data = await response.json();
-                    
-                    // Display video
-                    videoPreview.src = data.downloads[0].url;
-                    videoTitle.textContent = data.title || 'TikTok Video';
-                    videoAuthor.textContent = `By ${data.author || '@user'}`;
-                    
-                    // Set download links
-                    hdDownload.href = data.downloads.find(d => d.quality === 'HD')?.url || data.downloads[0].url;
-                    sdDownload.href = data.downloads.find(d => d.quality === 'SD')?.url || data.downloads[1]?.url || data.downloads[0].url;
-                    
+                // Assuming the API returns an object with fields like:
+                // {
+                //   title: string,
+                //   author: string,
+                //   downloads: [
+                //     { quality: 'HD', url: string, watermark: boolean },
+                //     { quality: 'SD', url: string, watermark: boolean }
+                //   ]
+                // }
+                // Adjust based on actual API response structure
+                videoPreview.src = data.downloads?.[0]?.url || '';
+                videoTitle.textContent = data.title || 'TikTok Video';
+                videoAuthor.textContent = `By ${data.author || '@user'}`;
+                
+                // Filter downloads based on watermark preference
+                const selectedDownloads = data.downloads?.filter(d => 
+                    version === 'no-watermark' ? !d.watermark : d.watermark
+                ) || [];
+                
+                // Set download links
+                hdDownload.href = selectedDownloads.find(d => d.quality === 'HD')?.url || 
+                                selectedDownloads[0]?.url || '';
+                sdDownload.href = selectedDownloads.find(d => d.quality === 'SD')?.url || 
+                                selectedDownloads[1]?.url || selectedDownloads[0]?.url || '';
+                
+                // Show results if valid URLs are found
+                if (hdDownload.href || sdDownload.href) {
                     resultContainer.style.display = 'block';
                     showStatus('Video loaded successfully!', 'success');
                 } else {
-                    // Direct download (redirect)
-                    window.location.href = apiUrl;
-                    return;
+                    throw new Error('No suitable download links found');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -497,4 +510,4 @@
         });
     </script>
 </body>
-  </html>
+</html>
