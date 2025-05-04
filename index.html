@@ -11,33 +11,86 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
+            background-color: #000;
+            font-family: 'Arial', sans-serif;
+            color: white;
         }
         
         .timer-container {
             text-align: center;
-            background-color: white;
-            padding: 30px 50px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
         }
         
-        .time {
-            font-size: 72px;
-            font-weight: bold;
+        .time-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
         }
         
-        .date {
+        .time {
+            font-size: 80px;
+            font-weight: 300;
+            letter-spacing: -2px;
+        }
+        
+        .ampm {
             font-size: 24px;
-            color: #555;
+            opacity: 0.8;
+            margin-left: 10px;
+            align-self: flex-end;
+            margin-bottom: 15px;
+        }
+        
+        .battery {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            margin-left: 20px;
+        }
+        
+        .battery-level {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .battery-fill {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            right: 2px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            height: 0%;
+            transition: height 0.5s ease;
+        }
+        
+        .date {
+            font-size: 20px;
+            opacity: 0.8;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="timer-container">
-        <div class="time" id="time">9:27</div>
+        <div class="time-row">
+            <div style="display: flex; align-items: flex-end;">
+                <div class="time" id="time">9:31</div>
+                <div class="ampm" id="ampm">AM</div>
+            </div>
+            <div class="battery" id="battery">
+                <div class="battery-fill" id="battery-fill"></div>
+                <div class="battery-level" id="battery-level">80%</div>
+            </div>
+        </div>
+        <div class="time" style="font-size: 60px; margin-bottom: 10px;" id="time-alt">9:31</div>
         <div class="date" id="date">Sunday, 4th May</div>
     </div>
 
@@ -45,11 +98,17 @@
         function updateTime() {
             const now = new Date();
             
-            // Format time (HH:MM)
+            // Format time (H:MM)
             let hours = now.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // Convert 0 to 12
             let minutes = now.getMinutes();
             minutes = minutes < 10 ? '0' + minutes : minutes;
+            
             document.getElementById('time').textContent = `${hours}:${minutes}`;
+            document.getElementById('time-alt').textContent = `${hours}:${minutes}`;
+            document.getElementById('ampm').textContent = ampm;
             
             // Format date (Weekday, Day Month)
             const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -72,9 +131,21 @@
             document.getElementById('date').textContent = `${dayName}, ${day}${suffix} ${monthName}`;
         }
         
+        function updateBattery() {
+            // This is a simulation - in a real app you'd use the Battery Status API
+            // For demo purposes, we'll cycle between 100% and 20%
+            const batteryLevel = Math.floor(Math.random() * 80) + 20; // Random between 20-100%
+            document.getElementById('battery-level').textContent = `${batteryLevel}%`;
+            document.getElementById('battery-fill').style.height = `${batteryLevel}%`;
+        }
+        
         // Update time immediately and then every second
         updateTime();
         setInterval(updateTime, 1000);
+        
+        // Update battery level every 10 seconds (simulated)
+        updateBattery();
+        setInterval(updateBattery, 10000);
     </script>
 </body>
 </html>
